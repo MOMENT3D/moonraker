@@ -133,7 +133,7 @@ JSON-RPC response:
 ```
 Some errors may not return a request ID, such as an improperly formatted request.
 
-The [moontest](https://www.github.com/arksine/moontest) repo includes a basic
+The [moontest](https://www.github.com/MOMENT3De/moontest) repo includes a basic
 test interface with example usage for most of the requests below.  It also
 includes a basic JSON-RPC implementation that uses promises to return responses
 and errors (see json-rpc.js).
@@ -207,7 +207,7 @@ performance improvement due to the simplified transport protocol, however
 the impact of this is likely negligible.
 
 The `moontest` repo contains a
-[python script](https://github.com/Arksine/moontest/blob/master/scripts/unix_socket_test.py)
+[python script](https://github.com/MOMENT3De/moontest/blob/master/scripts/unix_socket_test.py)
 to test comms over the unix socket.
 
 ### Jinja2 Template API Calls
@@ -698,7 +698,7 @@ JSON-RPC request (Websocket/Unix Socket Only):
         "client_name": "moontest",
         "version": "0.0.1",
         "type": "web",
-        "url": "http://github.com/arksine/moontest",
+        "url": "http://github.com/MOMENT3De/moontest",
         "access_token": "<base64 encoded token>",
         "api_key": "<system API key>"
     },
@@ -4034,8 +4034,8 @@ sorted by `date` and a list of feeds Moonraker is currently subscribed to:
     {
     "entries": [
         {
-            "entry_id": "arksine/moonlight/issue/3",
-            "url": "https://github.com/Arksine/moonlight/issues/3",
+            "entry_id": "MOMENT3De/moonlight/issue/3",
+            "url": "https://github.com/MOMENT3De/moonlight/issues/3",
             "title": "Test announcement 3",
             "description": "Test Description [with a link](https://moonraker.readthedocs.io).",
             "priority": "normal",
@@ -4047,8 +4047,8 @@ sorted by `date` and a list of feeds Moonraker is currently subscribed to:
             "feed": "moonlight"
         },
         {
-            "entry_id": "arksine/moonlight/issue/2",
-            "url": "https://github.com/Arksine/moonlight/issues/2",
+            "entry_id": "MOMENT3De/moonlight/issue/2",
+            "url": "https://github.com/MOMENT3De/moonlight/issues/2",
             "title": "Announcement Test Two",
             "description": "This is a high priority announcement. This line is included in the description.",
             "priority": "high",
@@ -4060,8 +4060,8 @@ sorted by `date` and a list of feeds Moonraker is currently subscribed to:
             "feed": "moonlight"
         },
         {
-            "entry_id": "arksine/moonlight/issue/1",
-            "url": "https://github.com/Arksine/moonlight/issues/1",
+            "entry_id": "MOMENT3De/moonlight/issue/1",
+            "url": "https://github.com/MOMENT3De/moonlight/issues/1",
             "title": "Announcement Test One",
             "description": "This is the description.  Anything here should appear in the announcement, up to 512 characters.",
             "priority": "normal",
@@ -4073,8 +4073,8 @@ sorted by `date` and a list of feeds Moonraker is currently subscribed to:
             "feed": "moonlight"
         },
         {
-            "entry_id": "arksine/moonraker/issue/349",
-            "url": "https://github.com/Arksine/moonraker/issues/349",
+            "entry_id": "MOMENT3De/moonraker/issue/349",
+            "url": "https://github.com/MOMENT3De/moonraker/issues/349",
             "title": "PolicyKit warnings; unable to manage services, restart system, or update packages",
             "description": "This announcement is an effort to get ahead of a coming change that will certainly result in issues.  PR #346  has been merged, and with it are some changes to Moonraker's default behavior.",
             "priority": "normal",
@@ -4123,8 +4123,8 @@ indicating if the update resulted in a change:
 {
     "entries": [
         {
-            "entry_id": "arksine/moonraker/issue/349",
-            "url": "https://github.com/Arksine/moonraker/issues/349",
+            "entry_id": "MOMENT3De/moonraker/issue/349",
+            "url": "https://github.com/MOMENT3De/moonraker/issues/349",
             "title": "PolicyKit warnings; unable to manage services, restart system, or update packages",
             "description": "This announcement is an effort to get ahead of a coming change that will certainly result in issues.  PR #346  has been merged, and with it are some changes to Moonraker's default behavior.",
             "priority": "normal",
@@ -4134,8 +4134,8 @@ indicating if the update resulted in a change:
             "feed": "Moonraker"
         },
         {
-            "entry_id": "arksine/moonlight/issue/1",
-            "url": "https://github.com/Arksine/moonlight/issues/1",
+            "entry_id": "MOMENT3De/moonlight/issue/1",
+            "url": "https://github.com/MOMENT3De/moonlight/issues/1",
             "title": "Announcement Test One",
             "description": "This is the description.  Anything here should appear in the announcement, up to 512 characters.",
             "priority": "normal",
@@ -4145,8 +4145,8 @@ indicating if the update resulted in a change:
             "feed": "Moonlight"
         },
         {
-            "entry_id": "arksine/moonlight/issue/2",
-            "url": "https://github.com/Arksine/moonlight/issues/2",
+            "entry_id": "MOMENT3De/moonlight/issue/2",
+            "url": "https://github.com/MOMENT3De/moonlight/issues/2",
             "title": "Announcement Test Two",
             "description": "This is a high priority announcement. This line is included in the description.",
             "priority": "high",
@@ -4156,8 +4156,8 @@ indicating if the update resulted in a change:
             "feed": "Moonlight"
         },
         {
-            "entry_id": "arksine/moonlight/issue/3",
-            "url": "https://github.com/Arksine/moonlight/issues/3",
+            "entry_id": "MOMENT3De/moonlight/issue/3",
+            "url": "https://github.com/MOMENT3De/moonlight/issues/3",
             "title": "Test announcement 3",
             "description": "Test Description [with a link](https://moonraker.readthedocs.io).",
             "priority": "normal",
@@ -4178,7 +4178,7 @@ to escape the ID if including it in the query string of an HTTP request.
 
 HTTP request:
 ```http
-POST /server/announcements/dismiss?entry_id=arksine%2Fmoonlight%2Fissue%2F1&wake_time=600
+POST /server/announcements/dismiss?entry_id=MOMENT3De%2Fmoonlight%2Fissue%2F1&wake_time=600
 ```
 JSON-RPC request:
 ```json
@@ -4186,7 +4186,7 @@ JSON-RPC request:
     "jsonrpc": "2.0",
     "method": "server.announcements.dismiss",
     "params": {
-        "entry_id": "arksine/moonlight/issue/1",
+        "entry_id": "MOMENT3De/moonlight/issue/1",
         "wake_time": 600
     },
     "id": 4654
@@ -4208,7 +4208,7 @@ The `entry_id` of the dismissed entry:
 
 ```json
 {
-    "entry_id": "arksine/moonlight/issue/1"
+    "entry_id": "MOMENT3De/moonlight/issue/1"
 }
 ```
 
@@ -4777,7 +4777,7 @@ and `fluidd` are present as clients configured in `moonraker.conf`
             "corrupt": false,
             "info_tags": [],
             "detected_type": "git_repo",
-            "remote_alias": "arksine",
+            "remote_alias": "MOMENT3D",
             "branch": "master",
             "owner": "?",
             "repo_name": "moonraker",
@@ -4792,11 +4792,11 @@ and `fluidd` are present as clients configured in `moonraker.conf`
             "git_messages": [],
             "full_version_string": "v0.7.1-364-gecfad5c",
             "pristine": true,
-            "recovery_url": "https://github.com/Arksine/moonraker.git",
-            "remote_url": "https://github.com/Arksine/moonraker.git",
+            "recovery_url": "https://github.com/MOMENT3D/moonraker.git",
+            "remote_url": "https://github.com/MOMENT3D/moonraker.git",
             "warnings": [],
             "anomalies": [
-                "Unofficial remote url: https://github.com/Arksine/moonraker-fork.git",
+                "Unofficial remote url: https://github.com/MOMENT3D/moonraker-fork.git",
                 "Repo not on offical remote/branch, expected: origin/master, detected: altremote/altbranch",
                 "Detached HEAD detected"
             ]
@@ -4870,8 +4870,8 @@ and `fluidd` are present as clients configured in `moonraker.conf`
             "git_messages": [],
             "full_version_string": "v0.10.0-1-g4c8d24ae-shallow",
             "pristine": true,
-            "recovery_url": "https://github.com/Klipper3d/klipper.git",
-            "remote_url": "https://github.com/Klipper3d/klipper.git",
+            "recovery_url": "https://github.com/MOMENT3D/klipper.git",
+            "remote_url": "https://github.com/MOMENT3D/klipper.git",
             "warnings": [],
             "anomalies": [],
         }
@@ -6686,7 +6686,7 @@ agent's identity:
             "name": "moonagent",
             "version": "0.0.1",
             "type": "agent",
-            "url": "https://github.com/arksine/moontest"
+            "url": "https://github.com/MOMENT3D/moontest"
         }
     ]
 }
@@ -7443,8 +7443,8 @@ a announcement entries are added or removed:
         {
             "entries": [
                 {
-                    "entry_id": "arksine/moonlight/issue/3",
-                    "url": "https://github.com/Arksine/moonlight/issues/3",
+                    "entry_id": "MOMENT3D/moonlight/issue/3",
+                    "url": "https://github.com/MOMENT3D/moonlight/issues/3",
                     "title": "Test announcement 3",
                     "description": "Test Description [with a link](https://moonraker.readthedocs.io).",
                     "priority": "normal",
@@ -7456,8 +7456,8 @@ a announcement entries are added or removed:
                     "feed": "moonlight"
                 },
                 {
-                    "entry_id": "arksine/moonlight/issue/2",
-                    "url": "https://github.com/Arksine/moonlight/issues/2",
+                    "entry_id": "MOMENT3D/moonlight/issue/2",
+                    "url": "https://github.com/MOMENT3D/moonlight/issues/2",
                     "title": "Announcement Test Two",
                     "description": "This is a high priority announcement. This line is included in the description.",
                     "priority": "high",
@@ -7469,8 +7469,8 @@ a announcement entries are added or removed:
                     "feed": "moonlight"
                 }
                 {
-                    "entry_id": "arksine/moonraker/issue/349",
-                    "url": "https://github.com/Arksine/moonraker/issues/349",
+                    "entry_id": "MOMENT3D/moonraker/issue/349",
+                    "url": "https://github.com/MOMENT3D/moonraker/issues/349",
                     "title": "PolicyKit warnings; unable to manage services, restart system, or update packages",
                     "description": "This announcement is an effort to get ahead of a coming change that will certainly result in issues.  PR #346  has been merged, and with it are some changes to Moonraker's default behavior.",
                     "priority": "normal",
@@ -7499,7 +7499,7 @@ a dismissed announcement is detected:
     "method": "notify_announcement_dismissed",
     "params": [
         {
-            "entry_id": "arksine/moonlight/issue/3"
+            "entry_id": "MOMENT3D/moonlight/issue/3"
         }
     ]
 }
@@ -7518,7 +7518,7 @@ a specified `wake_time` for a dismissed announcement has expired.
     "method": "notify_announcement_wake",
     "params": [
         {
-            "entry_id": "arksine/moonlight/issue/1"
+            "entry_id": "MOMENT3D/moonlight/issue/1"
         }
     ]
 }
@@ -7662,7 +7662,7 @@ an agent event is received.
                 "name": "moonagent",
                 "version": "0.0.1",
                 "type": "agent",
-                "url": "https://github.com/arksine/moontest"
+                "url": "https://github.com/MOMENT3D/moontest"
             }
         }
     ]
@@ -7906,10 +7906,10 @@ on client implementation.
 
 Moonraker announcements are GitHub issues tagged with the `announcement`
 label.  GitHub repos may registered with
-[moonlight](https://github.com/arksine/moonlight), which is responsible
+[moonlight](https://github.com/MOMENT3D/moonlight), which is responsible
 for generating RSS feeds from GitHub issues using GitHub's REST API. These
 RSS feeds are hosted on GitHub Pages, for example Moonraker's feed may be found
-[here](https://arksine.github.io/moonlight/assets/moonraker.xml). By
+[here](https://MOMENT3D.github.io/moonlight/assets/moonraker.xml). By
 centralizing GitHub API queries in `moonlight` we are able to poll multiple
 repos without running into API rate limit issues. Moonlight has has a workflow
 that checks all registered repos for new announcements every 30 minutes.  In
@@ -7982,36 +7982,36 @@ from moonlight's own issue tracker:
 
 ```xml
 <?xml version='1.0' encoding='utf-8'?>
-<rss version="2.0" xmlns:moonlight="https://arksine.github.io/moonlight">
+<rss version="2.0" xmlns:moonlight="https://MOMENT3D.github.io/moonlight">
     <channel>
-        <title>arksine/moonlight</title>
-        <link>https://github.com/Arksine/moonlight</link>
+        <title>MOMENT3De/moonlight</title>
+        <link>https://github.com/MOMENT3De/moonlight</link>
         <description>RSS Announcements for Moonraker</description>
         <pubDate>Tue, 22 Mar 2022 23:19:04 GMT</pubDate>
         <moonlight:configHash>f2912192bf0d09cf18d8b8af22b2d3501627043e5afa3ebff0e45e4794937901</moonlight:configHash>
         <item>
             <title>Test announcement 3</title>
-            <link>https://github.com/Arksine/moonlight/issues/3</link>
+            <link>https://github.com/MOMENT3De/moonlight/issues/3</link>
             <description>Test Description [with a link](https://moonraker.readthedocs.io).</description>
             <pubDate>Wed, 16 Mar 2022 19:33:39 GMT</pubDate>
             <category>normal</category>
-            <guid>arksine/moonlight/issue/3</guid>
+            <guid>MOMENT3De/moonlight/issue/3</guid>
         </item>
         <item>
             <title>Announcement Test Two</title>
-            <link>https://github.com/Arksine/moonlight/issues/2</link>
+            <link>https://github.com/MOMENT3De/moonlight/issues/2</link>
             <description>This is a high priority announcement. This line is included in the description.</description>
             <pubDate>Wed, 09 Mar 2022 19:52:59 GMT</pubDate>
             <category>high</category>
-            <guid>arksine/moonlight/issue/2</guid>
+            <guid>MOMENT3De/moonlight/issue/2</guid>
         </item>
         <item>
             <title>Announcement Test One</title>
-            <link>https://github.com/Arksine/moonlight/issues/1</link>
+            <link>https://github.com/MOMENT3De/moonlight/issues/1</link>
             <description>This is the description.  Anything here should appear in the announcement, up to 512 characters.</description>
             <pubDate>Wed, 09 Mar 2022 19:37:58 GMT</pubDate>
             <category>normal</category>
-            <guid>arksine/moonlight/issue/1</guid>
+            <guid>MOMENT3De/moonlight/issue/1</guid>
         </item>
     </channel>
 </rss>
@@ -8031,7 +8031,7 @@ script to generate announcements from issues in your repo:
 
 ```shell
 cd ~
-git clone https://github.com/arksine/moonlight
+git clone https://github.com/MOMENT3De/moonlight
 cd moonlight
 virtualenv -p /usr/bin/python3 .venv
 source .venv/bin/activate
@@ -8043,10 +8043,10 @@ To add your repo edit `~/moonlight/src/config.json`:
 ```json
 {
     "moonraker": {
-        "repo_owner": "Arksine",
+        "repo_owner": "MOMENT3De",
         "repo_name": "moonraker",
         "description": "API Host For Klipper",
-        "authorized_creators": ["Arksine"]
+        "authorized_creators": ["MOMENT3De"]
     },
     "klipper": {
         "repo_owner": "Klipper3d",
