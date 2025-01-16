@@ -27,7 +27,7 @@ BASE_CONFIG: Dict[str, Dict[str, str]] = {
         "requirements": "scripts/moonraker-requirements.txt",
         "venv_args": "-p python3",
         "system_dependencies": "scripts/system-dependencies.json",
-        "host_repo": "arksine/moonraker",
+        "host_repo": "MOMENT3D/moonraker",
         "virtualenv": sys.exec_prefix,
         "pip_environment_variables": "SKIP_CYTHON=Y",
         "path": str(source_info.source_path()),
@@ -39,7 +39,7 @@ BASE_CONFIG: Dict[str, Dict[str, str]] = {
         "requirements": "scripts/klippy-requirements.txt",
         "venv_args": "-p python3",
         "install_script": "scripts/install-octopi.sh",
-        "host_repo": "arksine/moonraker",
+        "host_repo": "MOMENT3D/moonraker",
         "managed_services": "klipper"
     }
 }
