@@ -114,12 +114,12 @@ not need to run unofficial 3rd party extensions, such as
 and do not desire to run the "bleeding edge" version of Moonraker.
 
 To perform this installation, download Moonraker's
-[install script](https://raw.githubusercontent.com/Arksine/moonraker/master/scripts/install-moonraker.sh)
+[install script](https://raw.githubusercontent.com/MOMENT3D/moonraker/master/scripts/install-moonraker.sh)
 from Github, then run the installer:
 
 ```
 cd ~
-wget https://raw.githubusercontent.com/Arksine/moonraker/master/scripts/install-moonraker.sh
+wget https://raw.githubusercontent.com/MOMENT3D/moonraker/master/scripts/install-moonraker.sh
 ./install-moonraker.sh
 ```
 
@@ -134,7 +134,7 @@ To install Moonraker from source, clone its git repository then run the installe
 
 ```
 cd ~
-git clone https://github.com/Arksine/moonraker.git
+git clone https://github.com/MOMENT3D/moonraker.git
 ~/moonraker/scripts/install-moonraker.sh
 ```
 
@@ -703,7 +703,7 @@ The following commands may be used to restore Moonraker:
 ```shell
 cd ~
 rm -rf moonraker
-git clone https://github.com/Arksine/moonraker.git
+git clone https://github.com/MOMENT3D/moonraker.git
 cd moonraker/scripts
 ./install-moonraker.sh
 ./set-policykit-rules.sh

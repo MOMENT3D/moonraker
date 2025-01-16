@@ -69,12 +69,12 @@ like the following:
 ```git
 power: add support for mqtt devices
 
-Signed-off-by: Eric Callahan <arksine.code@gmail.com>
+Signed-off-by: Eric Callahan <MOMENT3D.code@gmail.com>
 ```
 ```git
 docs: add mqtt power device documentation
 
-Signed-off-by: Eric Callahan <arksine.code@gmail.com>
+Signed-off-by: Eric Callahan <MOMENT3D.code@gmail.com>
 ```
 
 By signing off on commits, you acknowledge that you agree to the

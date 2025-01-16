@@ -169,7 +169,7 @@ class ZeroconfRegistrar:
 SSDP_ADDR = ("239.255.255.250", 1900)
 SSDP_SERVER_ID = "Moonraker SSDP/UPNP Server"
 SSDP_MAX_AGE = 1800
-SSDP_DEVICE_TYPE = "urn:arksine.github.io:device:Moonraker:1"
+SSDP_DEVICE_TYPE = "urn:MOMENT3D.github.io:device:Moonraker:1"
 SSDP_DEVICE_XML = """
 <?xml version="1.0"?>
 <root xmlns="urn:schemas-upnp-org:device-1-0" configId="{config_id}">
@@ -180,7 +180,7 @@ SSDP_DEVICE_XML = """
     <device>
         <deviceType>{device_type}</deviceType>
         <friendlyName>{friendly_name}</friendlyName>
-        <manufacturer>Arksine</manufacturer>
+        <manufacturer>MOMENT3D</manufacturer>
         <manufacturerURL>https://github.com/MOMENT3D/moonraker</manufacturerURL>
         <modelDescription>API Server for Klipper</modelDescription>
         <modelName>Moonraker</modelName>

@@ -1,6 +1,6 @@
 # Support for Moonraker/Klipper/Client announcements
 #
-# Copyright (C) 2022 Eric Callahan <arksine.code@gmail.com>
+# Copyright (C) 2022 Eric Callahan <MOMENT3D.code@gmail.com>
 #
 # This file may be distributed under the terms of the GNU GPLv3 license
 
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from .database import MoonrakerDatabase
 
 
-MOONLIGHT_URL = "https://arksine.github.io/moonlight"
+MOONLIGHT_URL = "https://MOMENT3D.github.io/moonlight"
 UPDATE_CHECK_TIME = 1800.
 etree.register_namespace("moonlight", MOONLIGHT_URL)
 

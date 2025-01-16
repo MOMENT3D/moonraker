@@ -23,7 +23,7 @@
 #    strings from pk-enum.c, then compares to the calculated
 #    strings from pk-enum.h.
 #
-# Copyright (C) 2022 Eric Callahan <arksine.code@gmail.com>
+# Copyright (C) 2022 Eric Callahan <MOMENT3D.code@gmail.com>
 #
 # Usage:
 #     pk-enum-converter.py pk_enum.h > enums.py

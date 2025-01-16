@@ -3,7 +3,7 @@ name = "moonraker"
 dynamic = ["version"]
 description = "API Server for Klipper"
 authors = [
-    {name = "Eric Callahan", email = "arksine.code@gmail.com"},
+    {name = "Eric Callahan", email = "MOMENT3D.code@gmail.com"},
 ]
 dependencies = [
     "tornado==6.2.0 ; python_version=='3.7'",

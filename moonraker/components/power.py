@@ -1,6 +1,6 @@
 # Power Switch Control
 #
-# Copyright (C) 2024 Eric Callahan <arksine.code@gmail.com>
+# Copyright (C) 2024 Eric Callahan <MOMENT3D.code@gmail.com>
 # Copyright (C) 2020 Jordan Ruthe <jordanruthe@gmail.com>
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.

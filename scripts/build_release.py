@@ -32,7 +32,7 @@ GIT_MAX_LOG_CNT = 100
 GIT_LOG_FMT = \
     "sha:%H%x1Dauthor:%an%x1Ddate:%ct%x1Dsubject:%s%x1Dmessage:%b%x1E"
 OWNER_REPOS = {
-    'moonraker': "arksine/moonraker",
+    'moonraker': "MOMENT3D/moonraker",
     'klippy': "klipper3d/klipper"
 }
 INSTALL_SCRIPTS = {

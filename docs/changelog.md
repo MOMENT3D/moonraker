@@ -221,10 +221,10 @@ The format is based on [Keep a Changelog].
 [api_changes.md]: api_changes.md
 
 <!-- Versions -->
-[unreleased]: https://github.com/Arksine/moonraker/compare/v0.9.3...HEAD
-[0.9.3]: https://github.com/Arksine/moonraker/compare/v0.9.2...v0.9.3
-[0.9.2]: https://github.com/Arksine/moonraker/compare/v0.9.1...v0.9.2
-[0.9.1]: https://github.com/Arksine/moonraker/compare/v0.9.0...v0.9.1
-[0.9.0]: https://github.com/Arksine/moonraker/compare/v0.8.0...v0.9.0
-[0.8.0]: https://github.com/Arksine/moonraker/compare/v0.7.1...v0.8.0
-[0.7.1]: https://github.com/Arksine/moonraker/releases/tag/v0.7.1
+[unreleased]: https://github.com/MOMENT3D/moonraker/compare/v0.9.3...HEAD
+[0.9.3]: https://github.com/MOMENT3D/moonraker/compare/v0.9.2...v0.9.3
+[0.9.2]: https://github.com/MOMENT3D/moonraker/compare/v0.9.1...v0.9.2
+[0.9.1]: https://github.com/MOMENT3D/moonraker/compare/v0.9.0...v0.9.1
+[0.9.0]: https://github.com/MOMENT3D/moonraker/compare/v0.8.0...v0.9.0
+[0.8.0]: https://github.com/MOMENT3D/moonraker/compare/v0.7.1...v0.8.0
+[0.7.1]: https://github.com/MOMENT3D/moonraker/releases/tag/v0.7.1
