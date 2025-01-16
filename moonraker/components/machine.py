@@ -51,23 +51,11 @@ if TYPE_CHECKING:
     from .announcements import Announcements
     from .proc_stats import ProcStats
     from .dbus_manager import DbusManager
-    from dbus_next.aio import ProxyInterface
-    from dbus_next import Variant
+    from dbus_fast.aio.proxy_object import ProxyInterface
+    from dbus_fast.signature import Variant
     SudoReturn = Union[Awaitable[Tuple[str, bool]], Tuple[str, bool]]
     SudoCallback = Callable[[], SudoReturn]
 
-DEFAULT_ALLOWED_SERVICES = [
-    "klipper_mcu",
-    "webcamd",
-    "MoonCord",
-    "KlipperScreen",
-    "moonraker-telegram-bot",
-    "moonraker-obico",
-    "sonar",
-    "crowsnest",
-    "octoeverywhere",
-    "ratos-configurator"
-]
 CGROUP_PATH = "/proc/1/cgroup"
 SCHED_PATH = "/proc/1/sched"
 SYSTEMD_PATH = "/etc/systemd/system"
@@ -96,6 +84,7 @@ class Machine:
         dist_info = {'name': distro.name(pretty=True)}
         dist_info.update(distro.info())
         dist_info['release_info'] = distro.distro_release_info()
+        dist_info['kernel_version'] = platform.release()
         self.inside_container = False
         self.moonraker_service_info: Dict[str, Any] = {}
         self.sudo_req_lock = asyncio.Lock()
@@ -197,20 +186,20 @@ class Machine:
         fpath = pathlib.Path(data_path).joinpath("moonraker.asvc")
         fm: FileManager = self.server.lookup_component("file_manager")
         fm.add_reserved_path("allowed_services", fpath, False)
+        default_svcs = source_info.read_asset("default_allowed_services") or ""
         try:
             if not fpath.exists():
-                fpath.write_text("\n".join(DEFAULT_ALLOWED_SERVICES))
+                fpath.write_text(default_svcs)
             data = fpath.read_text()
         except Exception:
-            logging.exception("Failed to read allowed_services.txt")
-            self._allowed_services = DEFAULT_ALLOWED_SERVICES
-        else:
-            svcs = [svc.strip() for svc in data.split("\n") if svc.strip()]
-            for svc in svcs:
-                if svc.endswith(".service"):
-                    svc = svc.rsplit(".", 1)[0]
-                if svc not in self._allowed_services:
-                    self._allowed_services.append(svc)
+            logging.exception("Failed to read moonraker.asvc")
+            data = default_svcs
+        svcs = [svc.strip() for svc in data.split("\n") if svc.strip()]
+        for svc in svcs:
+            if svc.endswith(".service"):
+                svc = svc.rsplit(".", 1)[0]
+            if svc not in self._allowed_services:
+                self._allowed_services.append(svc)
 
     def _update_log_rollover(self, log: bool = False) -> None:
         sys_info_msg = "\nSystem Info:"
@@ -988,7 +977,7 @@ class BaseProvider:
 
     async def extract_service_info(
         self,
-        service: str,
+        service_name: str,
         pid: int,
         properties: Optional[List[str]] = None,
         raw: bool = False
@@ -1575,15 +1564,15 @@ class SupervisordCliProvider(BaseProvider):
 
     async def extract_service_info(
         self,
-        service: str,
+        service_name: str,
         pid: int,
         properties: Optional[List[str]] = None,
         raw: bool = False
     ) -> Dict[str, Any]:
-        service_info = await self._find_service_by_pid(service, pid)
+        service_info = await self._find_service_by_pid(service_name, pid)
         if not service_info:
             logging.info(
-                f"Unable to locate service info for {service}, pid: {pid}"
+                f"Unable to locate service info for {service_name}, pid: {pid}"
             )
             return {}
         # locate supervisord.conf
@@ -1675,9 +1664,15 @@ class InstallValidator:
 
     async def validation_init(self) -> None:
         db: MoonrakerDatabase = self.server.lookup_component("database")
-        install_ver: int = await db.get_item(
-            "moonraker", "validate_install.install_version", 0
+        install_ver: Optional[int] = await db.get_item(
+            "moonraker", "validate_install.install_version", None
         )
+        if install_ver is None:
+            # skip validation for new installs
+            await db.insert_item(
+                "moonraker", "validate_install.install_version", INSTALL_VERSION
+            )
+            install_ver = INSTALL_VERSION
         if install_ver < INSTALL_VERSION:
             logging.info("Validation version in database out of date")
             self.validation_enabled = True
@@ -1703,8 +1698,8 @@ class InstallValidator:
         fm: FileManager = self.server.lookup_component("file_manager")
         need_restart: bool = False
         has_error: bool = False
+        name = "service"
         try:
-            name = "service"
             need_restart = await self._check_service_file()
             name = "config"
             need_restart |= await self._check_configuration()
@@ -1717,8 +1712,7 @@ class InstallValidator:
         except Exception as e:
             has_error = True
             msg = f"Failed to validate {name}: {e}"
-            logging.exception(msg)
-            self.server.add_warning(msg, log=False)
+            self.server.add_warning(msg, exc_info=e)
             fm.disable_write_access()
         else:
             self.validation_enabled = False
@@ -2155,8 +2149,8 @@ class InstallValidator:
         self.announcement_id = ""
 
     async def _on_password_received(self) -> Tuple[str, bool]:
+        name = "Service"
         try:
-            name = "Service"
             await self._check_service_file()
             name = "Config"
             await self._check_configuration()

@@ -35,19 +35,6 @@ if TYPE_CHECKING:
     from ..machine import Machine
     from ..file_manager.file_manager import FileManager
 
-MIN_PIP_VERSION = (23, 3, 2)
-
-SUPPORTED_CHANNELS = {
-    AppType.WEB: [Channel.STABLE, Channel.BETA],
-    AppType.ZIP: [Channel.STABLE, Channel.BETA],
-    AppType.GIT_REPO: list(Channel)
-}
-TYPE_TO_CHANNEL = {
-    AppType.WEB: Channel.STABLE,
-    AppType.ZIP: Channel.STABLE,
-    AppType.GIT_REPO: Channel.DEV
-}
-
 DISTRO_ALIASES = [distro.id()]
 DISTRO_ALIASES.extend(distro.like().split())
 
@@ -57,23 +44,18 @@ class AppDeploy(BaseDeploy):
     ) -> None:
         super().__init__(config, cmd_helper, prefix=prefix)
         self.config = config
-        type_choices = list(TYPE_TO_CHANNEL.keys())
-        self.type = AppType.from_string(config.get('type'))
-        if self.type not in type_choices:
-            str_types = [str(t) for t in type_choices]
-            raise config.error(
-                f"Section [{config.get_name()}], Option 'type: {self.type}': "
-                f"value must be one of the following choices: {str_types}"
-            )
-        self.channel = Channel.from_string(
-            config.get("channel", str(TYPE_TO_CHANNEL[self.type]))
+        type_choices = {str(t): t for t in AppType.valid_types()}
+        self.type = config.getchoice("type", type_choices)
+        channel_choices = {str(chnl): chnl for chnl in list(Channel)}
+        self.channel = config.getchoice(
+            "channel", channel_choices, str(self.type.default_channel)
         )
         self.channel_invalid: bool = False
-        if self.channel not in SUPPORTED_CHANNELS[self.type]:
-            str_channels = [str(c) for c in SUPPORTED_CHANNELS[self.type]]
+        if self.channel not in self.type.supported_channels:
+            str_channels = [str(c) for c in self.type.supported_channels]
             self.channel_invalid = True
             invalid_channel = self.channel
-            self.channel = TYPE_TO_CHANNEL[self.type]
+            self.channel = self.type.default_channel
             self.server.add_warning(
                 f"[{config.get_name()}]: Invalid value '{invalid_channel}' for "
                 f"option 'channel'. Type '{self.type}' supports the following "
@@ -280,6 +262,51 @@ class AppDeploy(BaseDeploy):
                     svc = kconn.unit_name
                 await machine.do_service_action("restart", svc)
 
+    def _convert_version(self, version: str) -> Tuple[str | int, ...]:
+        version = version.strip()
+        ver_match = re.match(r"\d+(\.\d+)*((?:-|\.).+)?", version)
+        if ver_match is not None:
+            return tuple([
+                int(part) if part.isdigit() else part
+                for part in re.split(r"\.|-", version)
+            ])
+        return (version,)
+
+    def _parse_system_dep(self, full_spec: str) -> str | None:
+        parts = full_spec.split(";", maxsplit=1)
+        if len(parts) == 1:
+            return full_spec
+        dep_parts = re.split(r"(==|!=|<=|>=|<|>)", parts[1].strip())
+        if len(dep_parts) != 3 or dep_parts[0].strip().lower() != "distro_version":
+            logging.info(f"Invalid requirement specifier: {full_spec}")
+            return None
+        pkg_name = parts[0].strip()
+        operator = dep_parts[1].strip()
+        distro_ver = self._convert_version(distro.version())
+        req_version = self._convert_version(dep_parts[2].strip())
+        try:
+            if operator == "<":
+                if distro_ver < req_version:
+                    return pkg_name
+            elif operator == ">":
+                if distro_ver > req_version:
+                    return pkg_name
+            elif operator == "==":
+                if distro_ver == req_version:
+                    return pkg_name
+            elif operator == "!=":
+                if distro_ver != req_version:
+                    return pkg_name
+            elif operator == ">=":
+                if distro_ver >= req_version:
+                    return pkg_name
+            elif operator == "<=":
+                if distro_ver <= req_version:
+                    return pkg_name
+        except TypeError:
+            pass
+        return None
+
     async def _read_system_dependencies(self) -> List[str]:
         eventloop = self.server.get_event_loop()
         if self.system_deps_json is not None:
@@ -299,7 +326,13 @@ class AppDeploy(BaseDeploy):
                             f"Dependency file '{deps_json.name}' contains an empty "
                             f"package definition for linux distro '{distro_id}'"
                         )
-                    return dep_info[distro_id]
+                        continue
+                    processed_deps: List[str] = []
+                    for dep in dep_info[distro_id]:
+                        parsed_dep = self._parse_system_dep(dep)
+                        if parsed_dep is not None:
+                            processed_deps.append(parsed_dep)
+                    return processed_deps
             else:
                 self.log_info(
                     f"Dependency file '{deps_json.name}' has no package definition "
@@ -319,7 +352,7 @@ class AppDeploy(BaseDeploy):
         except asyncio.CancelledError:
             raise
         except Exception:
-            logging.exception(f"Error reading install script: {deps_json}")
+            logging.exception(f"Error reading install script: {inst_path}")
             return []
         plines: List[str] = re.findall(r'PKGLIST="(.*)"', data)
         plines = [p.lstrip("${PKGLIST}").strip() for p in plines]
@@ -401,7 +434,17 @@ class AppDeploy(BaseDeploy):
         pip_exec = pip_utils.AsyncPipExecutor(
             self.pip_cmd, self.server, self.cmd_helper.notify_update_response
         )
-        # Check the current pip version
+        # Check and update the pip version
+        await self._update_pip(pip_exec)
+        self.notify_status("Updating python packages...")
+        try:
+            await pip_exec.install_packages(requirements, self.pip_env_vars)
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            self.log_exc("Error updating python requirements")
+
+    async def _update_pip(self, pip_exec: pip_utils.AsyncPipExecutor) -> None:
         self.notify_status("Checking pip version...")
         try:
             pip_ver = await pip_exec.get_pip_version()
@@ -413,18 +456,13 @@ class AppDeploy(BaseDeploy):
                 )
                 await pip_exec.update_pip()
                 self.pip_version = pip_utils.MIN_PIP_VERSION
+            else:
+                self.notify_status("Pip version up to date")
         except asyncio.CancelledError:
             raise
         except Exception as e:
             self.notify_status(f"Pip Version Check Error: {e}")
             self.log_exc("Pip Version Check Error")
-        self.notify_status("Updating python packages...")
-        try:
-            await pip_exec.install_packages(requirements, self.pip_env_vars)
-        except asyncio.CancelledError:
-            raise
-        except Exception:
-            self.log_exc("Error updating python requirements")
 
     async def _collect_dependency_info(self) -> Dict[str, Any]:
         pkg_deps = await self._read_system_dependencies()

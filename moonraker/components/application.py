@@ -56,6 +56,7 @@ if TYPE_CHECKING:
     from ..server import Server
     from ..eventloop import EventLoop
     from ..confighelper import ConfigHelper
+    from ..common import UserInfo
     from .klippy_connection import KlippyConnection as Klippy
     from ..utils import IPAddress
     from .websockets import WebsocketManager, WebSocket
@@ -65,10 +66,11 @@ if TYPE_CHECKING:
     from io import BufferedReader
     from .authorization import Authorization
     from .template import TemplateFactory, JinjaTemplate
-    MessageDelgate = Optional[tornado.httputil.HTTPMessageDelegate]
+    MessageDelgate = Optional[HTTPMessageDelegate]
     AuthComp = Optional[Authorization]
     APICallback = Callable[[WebRequest], Coroutine]
 
+# mypy: disable-error-code="attr-defined,name-defined"
 
 # 50 MiB Max Standard Body Size
 MAX_BODY_SIZE = 50 * 1024 * 1024
@@ -159,10 +161,10 @@ class PrimaryRouter(MutableRouter):
         else:
             log_method = access_log.error
         request_time = 1000.0 * handler.request.request_time()
-        user = handler.current_user
+        user: Optional[UserInfo] = handler.current_user
         username = "No User"
-        if user is not None and 'username' in user:
-            username = user['username']
+        if user is not None:
+            username = user.username
         log_method(
             f"{status_code} {handler._request_summary()} "
             f"[{username}] {request_time:.2f}ms"
@@ -316,10 +318,9 @@ class MoonrakerApp:
             svr.listen(port, address)
         except Exception as e:
             svr_type = "HTTPS" if "ssl_options" in args else "HTTP"
-            logging.exception(f"{svr_type} Server Start Failed")
             self.server.add_warning(
                 f"Failed to start {svr_type} server: {e}.  See moonraker.log "
-                "for more details."
+                "for more details.", exc_info=e
             )
             return None
         return svr
@@ -724,7 +725,7 @@ class RPCHandler(AuthorizedRequestHandler, APITransport):
         return TransportType.HTTP
 
     @property
-    def user_info(self) -> Optional[Dict[str, Any]]:
+    def user_info(self) -> Optional[UserInfo]:
         return self.current_user
 
     @property
@@ -979,10 +980,7 @@ class FileUploadHandler(AuthorizedRequestHandler):
     async def post(self) -> None:
         if self.parse_failed:
             self._file.on_finish()
-            try:
-                os.remove(self._file.filename)
-            except Exception:
-                pass
+            self._remove_temp_file()
             raise tornado.web.HTTPError(500, "File Upload Parsing Failed")
         form_args = {}
         chk_target = self._targets.pop('checksum')
@@ -991,27 +989,28 @@ class FileUploadHandler(AuthorizedRequestHandler):
             # Validate checksum
             recd_cksum = chk_target.value.decode().lower()
             if calc_chksum != recd_cksum:
-                # remove temporary file
-                try:
-                    os.remove(self._file.filename)
-                except Exception:
-                    pass
+                self._remove_temp_file()
                 raise tornado.web.HTTPError(
                     422,
                     f"File checksum mismatch: expected {recd_cksum}, "
                     f"calculated {calc_chksum}"
                 )
+        mp_fname: Optional[str] = self._file.multipart_filename
+        if mp_fname is None or not mp_fname.strip():
+            self._remove_temp_file()
+            raise tornado.web.HTTPError(400, "Multipart filename omitted")
         for name, target in self._targets.items():
             if target.value:
                 form_args[name] = target.value.decode()
-        form_args['filename'] = self._file.multipart_filename
+        form_args['filename'] = mp_fname
         form_args['tmp_file_path'] = self._file.filename
         debug_msg = "\nFile Upload Arguments:"
         for name, value in form_args.items():
             debug_msg += f"\n{name}: {value}"
         debug_msg += f"\nChecksum: {calc_chksum}"
+        form_args["current_user"] = self.current_user
         logging.debug(debug_msg)
-        logging.info(f"Processing Uploaded File: {self._file.multipart_filename}")
+        logging.info(f"Processing Uploaded File: {mp_fname}")
         try:
             result = await self.file_manager.finalize_upload(form_args)
         except ServerError as e:
@@ -1038,6 +1037,12 @@ class FileUploadHandler(AuthorizedRequestHandler):
         self.set_status(201)
         self.set_header("Content-Type", "application/json; charset=UTF-8")
         self.finish(jsonw.dumps(result))
+
+    def _remove_temp_file(self) -> None:
+        try:
+            os.remove(self._file.filename)
+        except Exception:
+            pass
 
 # Default Handler for unregistered endpoints
 class AuthorizedErrorHandler(AuthorizedRequestHandler):

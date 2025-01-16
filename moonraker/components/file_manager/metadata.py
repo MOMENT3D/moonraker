@@ -313,6 +313,7 @@ class PrusaSlicer(BaseSlicer):
             'SliCR-3D': r"SliCR-3D\s(.*)\son",
             'BambuStudio': r"BambuStudio[^ ]*\s(.*)\n",
             'A3dp-Slicer': r"A3dp-Slicer\s(.*)\son",
+            'QIDISlicer': r"QIDISlicer\s(.*)\son",
         }
         for name, expr in aliases.items():
             match = re.search(expr, data)
@@ -357,9 +358,14 @@ class PrusaSlicer(BaseSlicer):
         return regex_find_max_float(r"G1\sZ(%F)\sF", self.footer_data)
 
     def parse_filament_total(self) -> Optional[float]:
-        return regex_find_float(
-            r"filament\sused\s\[mm\]\s=\s(%F)", self.footer_data
-        )
+        line = regex_find_string(r'filament\sused\s\[mm\]\s=\s(%S)\n', self.footer_data)
+        if line:
+            filament = regex_find_floats(
+                r"(%F)", line
+            )
+            if filament:
+                return sum(filament)
+        return None
 
     def parse_filament_weight_total(self) -> Optional[float]:
         return regex_find_float(

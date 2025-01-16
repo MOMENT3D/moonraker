@@ -41,7 +41,7 @@ opt_four: Once again\# not a comment
   resulting `#` is stored in the value.
 - Option `opt_three` resolves to a value of `This is the value`.  The comment
   specifier is preceded by whitespace, thus the remainder of the line is
-  evaluted as a comment and removed from the option.
+  evaluated as a comment and removed from the option.
 - Option `opt_four` resolves to a value of `Once again\# not a comment`.
   The `\` character is not preceded by whitespace and not evaluated as
   an escape sequence, thus the escape character is not removed from the value.
@@ -128,7 +128,7 @@ check_klipper_config_path: True
 #   By default Moonraker will validate that Klipper's configuration file exists
 #   within the data path's "config" folder, as this is a requirement for
 #   Moonraker to write to the configuration.  If this validation check fails
-#   Moonaker will warn the user. Installations that do not wish to use Moonraker
+#   Moonraker will warn the user. Installations that do not wish to use Moonraker
 #   to manage Klipper's configuration may set this option to False to bypass the
 #   location check.  The default is True.
 enable_object_processing: False
@@ -675,11 +675,11 @@ The following configuration options are available for all power device types:
 type:
 #   The type of device.  Can be either gpio, klipper_device, rf,
 #   tplink_smartplug, tasmota, shelly, homeseer, homeassistant, loxonev1,
-#   smartthings, mqtt or hue.
+#   smartthings, mqtt, hue, http or uhubctl.
 #   This parameter must be provided.
 initial_state: off
 #    The state the power device should be initialized to.  May be on or
-#    off.  When this option is not specifed no initial state will be set.
+#    off.  When this option is not specified no initial state will be set.
 off_when_shutdown: False
 #   If set to True the device will be powered off when Klipper enters
 #   the "shutdown" state.  This option applies to all device types.
@@ -1324,9 +1324,8 @@ address:
 #   A valid ip address or hostname of the Philips Hue Bridge. This
 #   parameter must be provided.
 port:
-#   A port number if an alternative Zigbee bridge is used on a HTTP port 
+#   A port number if an alternative Zigbee bridge is used on a HTTP port
 #   different from the default 80/443
-#   
 user:
 #   The api key used for request authorization.  This option accepts
 #   Jinja2 Templates, see the [secrets] section for details.
@@ -1342,6 +1341,59 @@ device_type: light
 #   and if the device_type is group, the device_id should be the group id.
 #   The default is "light".
 
+```
+
+#### USB (uhubctl) devices
+
+Support for toggling USB powered devices via [uhubctl](https://github.com/mvp/uhubctl).
+
+!!! Note
+    The host machine must have `uhubctl` installed as a prerequisite.  In addition,
+    the required [udev rules](https://github.com/mvp/uhubctl#linux-usb-permissions)
+    must be installed on the host to give Moonraker permission to toggle hub
+    power without sudo.
+
+```ini
+location:
+#  Device location of the USB Hub connected to the device to control.  The
+#  location corresponds to the "-l" option of "uhubctl". This parameter
+#  must be provided.
+port:
+#  Port of the USB device to control.  The port corresponds to the "-p"
+#  option of "ububctl".  When omitted no port is provided to the uhubctl
+#  command.
+```
+
+!!! Tip
+    The `uhubctl` software can be used to list all compatible hubs on the
+    system by simply executing `uhubctl` with no arguments.  The following
+    is example output from a Raspberry Pi 3B+:
+
+    ```
+    Current status for hub 1-1.1 [0424:2514, USB 2.00, 3 ports, ppps]
+      Port 1: 0503 power highspeed enable connect [0424:7800]
+      Port 2: 0100 power
+      Port 3: 0100 power
+    Current status for hub 1-1 [0424:2514, USB 2.00, 4 ports, ppps]
+      Port 1: 0503 power highspeed enable connect [0424:2514, USB 2.00, 3 ports, ppps]
+      Port 2: 0100 power
+      Port 3: 0103 power enable connect [1d50:614e Klipper rp2040 45503571290B1068]
+      Port 4: 0100 power
+    Current status for hub 1 [1d6b:0002 Linux 6.6.28+rpt-rpi-v7 dwc_otg_hcd DWC OTG Controller 3f980000.usb, USB 2.00, 1 ports, ppps]
+      Port 1: 0503 power highspeed enable connect [0424:2514, USB 2.00, 4 ports, ppps]
+    ```
+
+##### Example
+
+```ini
+# moonraker.confg
+
+# Example for controlling a device connected to a Raspberry Pi 3B+.
+# Location 1-1 Port 2 controls power for all 4 exposed ports.
+[power my_usb_dev]
+type: uhubctl
+location: 1-1
+port: 2
 ```
 
 #### Generic HTTP Devices
@@ -1756,10 +1808,8 @@ refresh_window: 0-5
 #   Default is 0-5, meaning the refresh can only occur from midnight until 5am.
 #   It can go over midnight, e.g. 22-6.
 refresh_interval: 672
-#   The interval (in hours) after which the update manager will check
-#   for new updates.  This interval is applies to updates for Moonraker,
-#   Klipper, and System Packages, and is the default for all clients.
-#   The default is 672 hours (28 days).
+#   The default interval (in hours) between which the update manager will
+#   check for new updates.  The default is 672 hours (28 days).
 enable_system_updates: True
 #   A boolean value that can be used to toggle system package updates.
 #   Currently Moonraker only supports updating packages via APT, so
@@ -1774,20 +1824,32 @@ enable_packagekit: True
 #   updates will be processed via PackageKit over D-Bus.  When set to False
 #   the "apt cli" fallback will be used.  The default is True.
 channel: dev
-#   The update channel applied to Klipper and Moonraker.  May dev or
-#   beta.  The dev channel will update to the latest commit pushed
-#   to the repo, whereas the beta channel will update to the latest
-#   commit tagged by Moonraker.  The beta channel will see less frequent
-#   updates and should be more stable.  Users on the beta channel will have
-#   more opportunity to review breaking changes before choosing to update.
-#   The default is dev.
+#   The default update channel applied to Klipper and Moonraker.  May be
+#   stable, beta, or dev.  The dev channel will update to the latest commit
+#   pushed to the repo, whereas the beta channel will update to the latest
+#   commit tagged by Moonraker.  The beta and stable channels will see less
+#   frequent updates.  When omitted, Moonraker and Klipper will default to
+#   the channel based extension type.
 ```
+
+!!! Note
+    Configuration is automatically detected for Moonraker and Klipper, however
+    it is possible to override the `channel`, `pinned_commit`, and
+    `refresh_interval` options on a per application basis for each.  This can be
+    done by specifying the configuration in `moonraker.conf`.  For example:
+
+    ```ini
+    [update_manager klipper]
+    channel: dev
+    pinned_commit: 79930ed99a1fc284f41af5755908aa1fab948ce1
+    refresh_interval: 168
+    ```
 
 #### Extension Configuration
 The update manager may be configured manage additional software, henceforth
 referred to as "extensions".  In general terms, an extension may be defined
 as a piece of software hosted on GitHub.  The update manager breaks this
-down into 3 basic types:
+down into 4 basic types:
 
 - `web`: A front-end such as Mainsail or Fluidd.  Updates are deployed via
   zip files created for GitHub releases.
@@ -1796,8 +1858,10 @@ down into 3 basic types:
   manage extensions installed a service such as KlipperScreen, repos containing
   configuration, and unofficial 3rd party extensions for Klipper and Moonraker.
   See the note below in reference to unofficial extensions.
-- `zip`:  This can be used to managed various extensions like the `git_repo`
+- `zip`:  This can be used to manage various extensions like the `git_repo`
   type, however its updates are deployed via zipped GitHub releases.
+- `python`:  The python type can be used to update python applications installed
+  using `pip` in a virtual environment.
 
 !!! Note
     To benefit the community Moonraker facilitates updates for 3rd party
@@ -1892,12 +1956,11 @@ type: git_repo
 #   extension chooses to deploy updates, see its documentation for details.
 #   This parameter must be provided.
 channel: dev
-#   The update channel.  The available value differs depending on the
-#   "type" option.
-#      type: git_repo - May be dev or beta.  The dev channel will update to
-#                       the latest pushed commit, whereas the beta channel
-#                       will update to the latest tagged commit.
+#   The update channel.  May be set to stable, beta, or dev.
 #   The default is dev.
+refresh_interval:
+#   This overrides the refresh_interval set in the primary [update_manager]
+#   section.
 path:
 #   The absolute path to the client's files on disk. This parameter must be
 #   provided.
@@ -1998,6 +2061,14 @@ info_tags:
 #   Frontends my use these tags to perform additional actions or display
 #   information, see your extension documentation for details on configuration.
 #   The default is an empty list (no info tags).
+pinned_commit:
+#   A git commit hash to "pin" updates to.  When specified Moonraker will not
+#   update the repo beyond the pinned commit.  If the repo is already beyond
+#   the specified commit, or if the commit is not in the repo, futher updates
+#   are disabled until the pinned_commit is changed.  It is recommended to
+#   specify the complete hash, however abbreviated hashes with a minimum of
+#   8 characters are accepted.  The "pinned_commit" overrides the update
+#   behavior set by the "channel" option.  The default is no pinned commit.
 ```
 
 !!! Note
@@ -2025,6 +2096,7 @@ either be cross-platform, or it needs to deploy binaries for multiple platforms
 and be able to choose the correct one based on the system.
 
 ```ini
+type: zip
 channel: stable
 #   May be stable or beta.  When beta is specified "pre-release"
 #   updates are available.  The default is stable.
@@ -2057,11 +2129,106 @@ info_tags:
 #   options.
 ```
 
+#### Python Application Configuration
+
+The `python` type can be used to update python applications installed via pip
+in a virtual environment.  Moonraker can update applications installed from
+a python index such as [PyPI](https://pypi.org/), or from a
+[github repo](https://pip.pypa.io/en/stable/topics/vcs-support/).  The source
+is automatically detected based on the metadata of the currently installed
+package.
+
+```ini
+type: python
+channel: stable
+#   May be stable or beta.  When beta is specified "pre-release"
+#   updates are available.  The default is stable.
+refresh_interval:
+#   This overrides the refresh_interval set in the primary [update_manager]
+#   section.
+virtualenv:
+#   Path to the virtual enviromnent containing the python application.
+project_name:
+#   Name of the python project as listed in the python package index.  If
+#   the packaged is sourced from GitHub, this will be the name of the package
+#   when built.  The default is the name specified by the configuration
+#   section.
+primary_branch:
+#   For packages sourced from GitHub, this option may be used to specify the
+#   branch to fetch updates from when the channel is set to "dev".  The default
+#   is no primary branch.
+is_system_service: True
+managed_services:
+info_tags:
+#   See the git_repo type documentation for detailed descriptions of the above
+#   options.
+```
+
+##### The optional release_info file
+
+Python applications may include a `release_info` file in the package
+folder that provides supplemental information for the application.  The
+`release_info` file should contain a json object with the following fields:
+
+
+- `project_name`: The name of the project as listed in the python index.
+- `package_name`: The name of the package as installed.  This is often the
+  same of the `project_name`, but may differ.
+- `urls`: An object containing a mapping of url types to urls.  These urls
+  should match urls provided in the metadata.
+- `package_version`:  The version of the built package.
+- `git_version`:  The git version as returned by
+  `git describe --tags --always --long --dirty`
+- `commit_sha`:  The hash of the git commit the build was based on.
+- `build_time`:  The time of the build in ISO format.
+- `system_dependencies`:  An object containing a mapping of OS packages
+  the python application depends on.  The object should be of the same
+  format described in the
+  [system dependencies file](#the-system-dependencies-file-format) used
+  by the `git_repo` and `zip` types.
+
+  For example, Moonraker's `release_info` looks similar to the following:
+
+```json
+{
+    "project_name": "moonraker",
+    "package_name": "moonraker",
+    "urls": {
+        "homepage": "https://github.com/Arksine/moonraker",
+        "repository": "https://github.com/Arksine/moonraker",
+        "documentation": "https://moonraker.readthedocs.io",
+        "changelog": "https://moonraker.readthedocs.io/en/latest/changelog/"
+    },
+    "package_version": "0.9.0",
+    "git_version": "v0.9.0-0-g2abdb11",
+    "commit_sha": "2abdb112a5f16e6d5286df3680cf7fdb77aed845",
+    "build_time": "2024-05-26T18:59:52+00:00",
+    "system_dependencies": {
+        "debian": [
+            "python3-virtualenv",
+            "python3-dev",
+            "libopenjp2-7",
+            "libsodium-dev",
+            "zlib1g-dev",
+            "libjpeg-dev",
+            "packagekit",
+            "wireless-tools",
+            "curl"
+        ]
+    }
+}
+```
+
+Moonraker uses the [PDM backend](https://backend.pdm-project.org/) to perform
+its package builds.  An example of a pdm build script that generates a
+`release_info` file may be found
+[here](https://github.com/Arksine/moonraker/blob/master/pdm_build.py).
+
 #### The System Dependencies File Format
 
-When an application depends on OS packages it is possible to specify them
-in a file that Moonraker can refer to.  During an update Moonraker will
-use this file to install new dependencies if they are detected.
+When a `zip` or `git_repo` application depends on OS packages it is possible
+to specify them in a file that Moonraker can refer to.  During an update
+Moonraker will use this file to install new dependencies if they are detected.
 
 Below is an example of Moonraker's system dependcies file, located at
 in the repository at
@@ -2114,6 +2281,14 @@ address:
 #   parameter must be provided.
 port:
 #   Port the Broker is listening on.  Default is 1883.
+client_id:
+#   A string client identifer sent by the client to the broker after
+#   connecting.  The default is a randomly assigned client id.
+enable_tls: False
+#   Enables SSL/TLS connections when set to true.  Note that if a user intends
+#   to connect to a local MQTT service using a self signed certificate then
+#   it will be necessary to install the root CA certificate on the machine
+#   hosting Moonraker.  Default is False.
 username:
 #   An optional username used to log in to the Broker.  This option accepts
 #   Jinja2 Templates, see the [secrets] section for details. The default is
@@ -2178,6 +2353,10 @@ status_objects:
 #
 #   If not configured then no objects will be tracked and published to
 #   the klipper/status topic.
+status_interval:
+#   The interval (in seconds) between published status updates.  This value
+#   can be used to limit the rate of updates published.  By default Moonraker
+#   will publish Klipper status updates as it receives them.
 publish_split_status: False
 #   Configures how to publish status updates to MQTT.
 #
@@ -2805,7 +2984,113 @@ type:
 name:
 #   The friendly display name of the sensor.
 #   The default is the sensor source name.
+parameter_{parameter_name}:
+#   Optional parameter descriptions.  Each sensor can report
+#   one or parameters. Frontends can use this data to accurately
+#   present sensor details to the user.  The {parameter_name} must
+#   be a valid measurement reported by the sensor. The value should be
+#   a newline separated list of key-value pairs describing the
+#   the measurement.  Currently the only key used is "units". For
+#   example, the configuration for a parameter may look like the follwing:
+#
+#     parameter_energy:
+#       units=kWh
+#
+history_field_{field_name}:
+#   Optional history field description.  When provided the named
+#   field will be tracked in Moonraker's Job History component.
+#   The "field_name" portion of the option is the identifier used
+#   when reported in the history.  Multiple history fields may be
+#   added and tracked for a sensor.  See the "History Fields" note
+#   for a detailed explanation of this option.
 ```
+
+!!! note "History Fields"
+    A `history_field_{name}` option must contain a series of key-value pairs.
+    The key and value must be separated by an equal sign (=), and each
+    pair must be separated by a newline.  The following keys are
+    available:
+
+    -  `parameter`: The name of the sensor parameter which is used to
+       provide values for this field.  This name must match a field name
+       set in the specific sensor implementation (ie: see the
+       "state_response_template" option for the MQTT type.)  This must
+       be provided.
+    -  `desc`: A brief description of the field.
+    -  `strategy`:  The tracking strategy used to calculate the value
+       stored in the history. See below for available strategies.
+       The default is "basic".
+    -  `units`:  An optional unit specifier for the value
+    -  `init_tracker`:  When set to true the tracked value will be initialized
+       to the last sensor measurement when a job starts.  The "delta"
+       strategy will initialize its "last value", setting this measurement
+       as the reference rather than the first received after the print starts.
+       Default is false.
+    -  `exclude_paused`:  When set to true the values received when
+       a job is paused will be ignored.  Default is false.
+    -  `report_total`:  When set to true the value reported for all
+       jobs will be accumulated and reported in the history totals.
+       Default is false.
+    -  `report_maximum`:  When set to true maximum value for all jobs
+       will be reported in the history totals.  Default is false.
+    -  `precision`:  An integer value indicating the precision to use when
+       reporting decimal values.  This precision applies to both job history
+       AND job totals.  The default is no precision, ie: no rounding will
+       occur.
+
+    Note that job totals for history fields only persist for a currently
+    configured sensor and history field name.  If the name of the sensor
+    changes, the name of the field changes, or if either are removed
+    from the configuration, then their totals will be discarded.  This
+    prevents the accumulation of stale totals.
+
+    Moonraker provides several history tracking strategies that can be used
+    accommodate how values should be tracked and stored in the job history:
+
+    - `basic`: This strategy should be used if the value should be stored
+      in history directly as it is received.  Simply put, the last value
+      received before a job completes wiill the the value stored in the job
+      history.
+    - `accumulate`:  When a job starts, the tracked value initialized to 0 or
+      the last received measurement.  New measurements will be added to the
+      tracked value as they are received.  The total cumulative value will be
+      reported when the job ends.
+    - `delta`:  When a job starts the tracked value is 0.  The total value
+      will be the delta between the final measurement received before the job
+      ends and the first measurement received when after job begins.  Note that
+      if `exclude_paused` is set then the tracker will accumulate deltas
+      between pauses.  If the measurement does not update frequently this could
+      significantly alter the final result.
+    - `average`: Reports an average of all measurements received during the job.
+    - `maximum`: Reports the maximum value of all measurements received during
+       the job.
+    - `minimum`: Reports the minimum value of all measurements received during
+       the job.
+    - `collect`:  Measurements are stored in a list as they are received.
+      Duplicate measurements are discarded.  A maximum of 100 entries may
+      be stored, the oldest measurements will be discarded when this limit
+      is exceeded.  This strategy is useful for a sensor that reports some
+      data infrequently and its desirable to include all measurements in the
+      job history.  For example, the `spoolman` component uses this strategy
+      to report all spool IDs set during a job.  When this strategy is enabled
+      the `track_total` and `track_maximum` options are ignored, as it is not
+      possible to report totals for a collection.
+
+    Example:
+
+    ```
+    history_field_total_energy:
+      parameter=energy
+      desc=Printer power consumption
+      strategy=delta
+      units=kWh
+      init_tracker=false
+      exclude_paused=false
+      report_total=true
+      report_maximum=true
+      precision=6
+    ```
+
 
 #### MQTT Sensor Configuration
 
@@ -2837,7 +3122,7 @@ state_response_template:
 #
 #  The above example assumes a json response with multiple fields in a struct
 #  is received. Individual measurements are extracted from that struct, coerced
-#  to a numeric format and passed to Moonraker. The default is the payload.
+#  to a numeric format and passed to Moonraker. This parameter must be provided.
 ```
 
 !!! Note
@@ -2860,6 +3145,14 @@ Example:
 [sensor mqtt_powermeter]
 type: mqtt
 name: Powermeter
+parameter_power:
+  units=W
+parameter_voltage:
+  units=V
+parameter_current:
+  units=mA
+parameter_energy:
+  units=kWh
 # Use a different display name
 state_topic: shellypro1pm-8cb113caba09/status/switch:0
 # The response is a JSON object with a multiple fields that we convert to
@@ -2870,6 +3163,63 @@ state_response_template:
   {set_result("voltage", notification["voltage"]|float)}
   {set_result("current", notification["current"]|float)}
   {set_result("energy", notification["aenergy"]["by_minute"][0]|float * 0.000001)}
+```
+
+Tasmota Example:
+
+!!! Note
+    It may be necessary to set Tasmota's Telemetry Period to a low value
+    to acheive a decent response.  This can be done in the with the
+    `TelePeriod` command via the console.  For example, the command
+    to set the telemetry period to 10 seconds is:
+
+    `cmnd/%device_name%/TelePeriod` with a payload of `10`.
+
+```ini
+[sensor tasmota_power]
+type: mqtt
+state_topic: tele/tasmota_switch/SENSOR
+state_response_template:
+  {% set resp = payload|fromjson %}
+  {% set edata = resp["ENERGY"] %}
+  {set_result("energy", edata["Total"])}
+  {set_result("voltage", edata["Voltage"])}
+  {set_result("power", edata["Power"])}
+  {set_result("current", edata["Current"])}
+parameter_power:
+  units=W
+parameter_voltage:
+  units=V
+parameter_current:
+  units=mA
+parameter_energy:
+  units=kWh
+history_field_energy_consumption:
+  parameter=energy
+  desc=Printer energy consumption
+  strategy=delta
+  units=kWh
+  init_tracker=true
+  precision=6
+  exclude_paused=false
+  report_total=true
+  report_maximum=true
+history_field_average_current:
+  parameter=current
+  desc=Average current draw
+  strategy=average
+  units=A
+  report_total=false
+  report_maximum=true
+# Mulitple history fields may track the same sensor parameter:
+history_field_max_current:
+  parameter=current
+  desc=Maximum current draw
+  strategy=maximum
+  units=A
+  init_tracker=true
+  report_total=false
+  report_maximum=false
 ```
 
 ### `[spoolman]`
