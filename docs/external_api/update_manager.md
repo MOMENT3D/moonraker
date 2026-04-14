@@ -83,8 +83,8 @@ The `refresh` parameter is deprecated.  Front end developers should use the
             "git_messages": [],
             "full_version_string": "v0.7.1-364-gecfad5c",
             "pristine": true,
-            "recovery_url": "https://github.com/Arksine/moonraker.git",
-            "remote_url": "https://github.com/Arksine/moonraker.git",
+            "recovery_url": "https://github.com/MOMENT3D/moonraker.git",
+            "remote_url": "https://github.com/MOMENT3D/moonraker.git",
             "warnings": [],
             "anomalies": [
                 "Unofficial remote url: https://github.com/Arksine/moonraker-fork.git",
@@ -162,8 +162,8 @@ The `refresh` parameter is deprecated.  Front end developers should use the
             "git_messages": [],
             "full_version_string": "v0.10.0-1-g4c8d24ae-shallow",
             "pristine": true,
-            "recovery_url": "https://github.com/Klipper3d/klipper.git",
-            "remote_url": "https://github.com/Klipper3d/klipper.git",
+            "recovery_url": "https://github.com/MOMENT3D/klipper.git",
+            "remote_url": "https://github.com/MOMENT3D/klipper.git",
             "warnings": [],
             "anomalies": []
         }

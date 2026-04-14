@@ -1,6 +1,7 @@
 site_name: Moonraker
 site_url: https://moonraker.readthedocs.io
-repo_url: https://github.com/Arksine/moonraker
+repo_url: https://github.com/MOMENT3D
+/moonraker
 edit_uri: blob/master/docs/
 nav:
     - Installation: installation.md

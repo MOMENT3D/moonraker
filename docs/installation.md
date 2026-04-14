@@ -134,7 +134,7 @@ To install Moonraker from source, clone its git repository then run the installe
 
 ```
 cd ~
-git clone https://github.com/Arksine/moonraker.git
+git clone https://github.com/MOMENT3D/moonraker.git
 ~/moonraker/scripts/install-moonraker.sh
 ```
 
@@ -718,7 +718,7 @@ The following commands may be used to restore Moonraker:
 ```shell
 cd ~
 rm -rf moonraker
-git clone https://github.com/Arksine/moonraker.git
+git clone https://github.com/MOMENT3D/moonraker.git
 cd moonraker/scripts
 ./install-moonraker.sh
 ./set-policykit-rules.sh
@@ -730,7 +730,7 @@ And for Klipper:
 ```shell
 cd ~
 rm -rf klipper
-git clone https://github.com/Klipper3d/klipper.git
+git clone https://github.com/MOMENT3D/klipper.git
 sudo systemctl restart klipper
 ```
 

@@ -2495,8 +2495,8 @@ folder that provides supplemental information for the application.  The
     "project_name": "moonraker",
     "package_name": "moonraker",
     "urls": {
-        "homepage": "https://github.com/Arksine/moonraker",
-        "repository": "https://github.com/Arksine/moonraker",
+        "homepage": "https://github.com/MOMENT3D/moonraker",
+        "repository": "https://github.com/MOMENT3D/moonraker",
         "documentation": "https://moonraker.readthedocs.io",
         "changelog": "https://moonraker.readthedocs.io/en/latest/changelog/"
     },
@@ -2523,7 +2523,7 @@ folder that provides supplemental information for the application.  The
 Moonraker uses the [PDM backend](https://backend.pdm-project.org/) to perform
 its package builds.  An example of a pdm build script that generates a
 `release_info` file may be found
-[here](https://github.com/Arksine/moonraker/blob/master/pdm_build.py).
+[here](https://github.com/MOMENT3D/moonraker/blob/master/pdm_build.py).
 
 #### The System Dependencies File Format
 
@@ -2533,7 +2533,7 @@ Moonraker will use this file to install new dependencies if they are detected.
 
 Below is an example of Moonraker's system dependencies file, located at
 in the repository at
-[scripts/system-dependencies.json](https://github.com/Arksine/moonraker/blob/master/scripts/system-dependencies.json):
+[scripts/system-dependencies.json](https://github.com/MOMENT3D/moonraker/blob/master/scripts/system-dependencies.json):
 
 ```json
 {
@@ -3090,7 +3090,7 @@ should be consulted to determine the format of the notifier's `url` option.
 The Apprise library is actively developed and frequently adds new notification
 services. When at least one notifier has been configured `moonraker.log` will
 report the currently installed version of Apprise.  Alternatively Moonraker's
-[pyproject.toml](https://github.com/Arksine/moonraker/blob/master/pyproject.toml)
+[pyproject.toml](https://github.com/MOMENT3D/moonraker/blob/master/pyproject.toml)
 can be be referenced to determine the latest version of Apprise that should be
 installed. For example:
 

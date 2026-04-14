@@ -2,7 +2,7 @@
 
 Moonraker is a Python 3 based web server that exposes APIs with which
 client applications may use to interact with the 3D printing firmware
-[Klipper](https://github.com/Klipper3d/klipper). Communication between
+[Klipper](https://github.com/MOMENT3D/klipper). Communication between
 the Klippy host and Moonraker is done over a Unix Domain Socket.  Tornado
 is used to provide Moonraker's server functionality.
 
