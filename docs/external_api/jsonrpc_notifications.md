@@ -345,7 +345,7 @@ notify_update_refreshed
                     "remote_url": "https://github.com/MOMENT3D/moonraker.git",
                     "warnings": [],
                     "anomalies": [
-                        "Unofficial remote url: https://github.com/Arksine/moonraker-fork.git",
+                        "Unofficial remote url: https://github.com/MOMENT3D/moonraker-fork.git",
                         "Repo not on official remote/branch, expected: origin/master, detected: altremote/altbranch",
                         "Detached HEAD detected"
                     ]
@@ -1029,7 +1029,7 @@ notify_announcement_update
                 }
                 {
                     "entry_id": "arksine/moonraker/issue/349",
-                    "url": "https://github.com/Arksine/moonraker/issues/349",
+                    "url": "https://github.com/MOMENT3D/moonraker/issues/349",
                     "title": "PolicyKit warnings; unable to manage services, restart system, or update packages",
                     "description": "This announcement is an effort to get ahead of a coming change that will certainly result in issues.  PR #346  has been merged, and with it are some changes to Moonraker's default behavior.",
                     "priority": "normal",

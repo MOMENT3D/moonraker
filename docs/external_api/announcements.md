@@ -82,7 +82,7 @@ GET /server/announcements/list?include_dismissed=false
         },
         {
             "entry_id": "arksine/moonraker/issue/349",
-            "url": "https://github.com/Arksine/moonraker/issues/349",
+            "url": "https://github.com/MOMENT3D/moonraker/issues/349",
             "title": "PolicyKit warnings; unable to manage services, restart system, or update packages",
             "description": "This announcement is an effort to get ahead of a coming change that will certainly result in issues.  PR #346  has been merged, and with it are some changes to Moonraker's default behavior.",
             "priority": "normal",
@@ -191,7 +191,7 @@ indicating if the update resulted in a change:
     "entries": [
         {
             "entry_id": "arksine/moonraker/issue/349",
-            "url": "https://github.com/Arksine/moonraker/issues/349",
+            "url": "https://github.com/MOMENT3D/moonraker/issues/349",
             "title": "PolicyKit warnings; unable to manage services, restart system, or update packages",
             "description": "This announcement is an effort to get ahead of a coming change that will certainly result in issues.  PR #346  has been merged, and with it are some changes to Moonraker's default behavior.",
             "priority": "normal",
