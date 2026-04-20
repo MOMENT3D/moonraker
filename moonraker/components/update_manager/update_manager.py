@@ -11,6 +11,8 @@ import logging
 import time
 import tempfile
 import pathlib
+# 업데이트 성공 후 파일 복사 by JJH shutil 추가
+import shutil
 from .common import AppType, get_base_configuration
 from .base_deploy import BaseDeploy
 from .app_deploy import AppDeploy
@@ -184,6 +186,24 @@ class UpdateManager:
         # Register Ready Event
         self.server.register_event_handler(
             "server:klippy_identified", self._set_klipper_repo)
+        
+    def _copy_update_files(self):
+        target_dir = "/home/biqu/printer_data/development/announcements"
+        os.makedirs(target_dir, exist_ok=True)
+
+        for fname in ["moonraker.xml", "klipper.xml"]:
+            src = f"/home/biqu/moonraker/extras/{fname}"
+            try:
+                if os.path.exists(src):
+                    shutil.copy(src, target_dir)
+                    logging.info("copied %s → %s", src, target_dir)
+                else:
+                    logging.warning("source file not found: %s", src)
+            except Exception as e:
+                logging.error("Error copying %s: %s", src, e)
+
+        # 디스크에 강제 flush (시점 문제 방지)
+        os.sync()
 
     def get_updaters(self) -> Dict[str, BaseDeploy]:
         return self.updaters
@@ -303,27 +323,35 @@ class UpdateManager:
     async def _handle_update_request(self, web_request: WebRequest) -> str:
         if self.kconn.is_printing():
             raise self.server.error("Update Refused: Klippy is printing", 503)
+
         app: str = web_request.get_endpoint().split("/")[-1]
         if app in ("upgrade", "client"):
             app_name = web_request.get_str("name", None)
             if app_name is None:
                 return await self._handle_full_update_request(web_request)
             app = app_name
+
         if self.cmd_helper.is_app_updating(app):
             raise self.server.error(f"Item {app} is currently updating", 503)
+
         updater = self.updaters.get(app, None)
         if updater is None:
             raise self.server.error(f"Updater {app} not available", 404)
+
         async with self.cmd_request_lock:
             self.cmd_helper.set_update_info(app, id(web_request))
             try:
                 await updater.update()
+                self._copy_update_files()  # 업데이트 성공 후 파일 복사 by JJH
+                os.sync()                  # 디스크 flush
             except Exception as e:
                 self.cmd_helper.notify_update_response(
-                    f"Error updating {app}: {e}", is_complete=True)
+                f"Error updating {app}: {e}", is_complete=True
+                )
                 raise
             finally:
                 self.cmd_helper.clear_update_info()
+
         return "ok"
 
     async def _handle_full_update_request(self, web_request: WebRequest) -> str:
@@ -375,16 +403,23 @@ class UpdateManager:
                 await moon_updater.update()
                 if self.cmd_helper.needs_service_restart(app_name):
                     await moon_updater.restart_service()
+
+                # 업데이트 성공 후 파일 복사 by JJH
+                self._copy_update_files()
+                os.sync()
+
                 self.cmd_helper.set_full_complete(True)
-                self.cmd_helper.notify_update_response(
-                    "Full Update Complete", is_complete=True)
+                self.cmd_helper.notify_update_response("Full Update Complete", is_complete=True)
+
             except Exception as e:
                 self.cmd_helper.set_full_complete(True)
                 self.cmd_helper.notify_update_response(
-                    f"Error updating {app_name}: {e}", is_complete=True)
+                    f"Error updating {app_name}: {e}", is_complete=True
+                )
                 raise
             finally:
                 self.cmd_helper.clear_update_info()
+
             return "ok"
 
     async def _handle_status_request(self,

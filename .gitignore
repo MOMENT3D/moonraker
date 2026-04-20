@@ -20,7 +20,7 @@ share
 .pytest_cache
 
 .vs/
-.sqlite
+.vs/*
 
 # Sometimes uv lock generates the version file and places it in
 # the repo.  We don't want to commit this, so ignore it
