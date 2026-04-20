@@ -11,7 +11,7 @@ import logging
 import time
 import tempfile
 import pathlib
-# 업데이트 성공 후 파일 복사 by JJH shutil 추가
+# Copy files after successful update by JJH shutil
 import shutil
 from .common import AppType, get_base_configuration
 from .base_deploy import BaseDeploy
@@ -202,8 +202,10 @@ class UpdateManager:
             except Exception as e:
                 logging.error("Error copying %s: %s", src, e)
 
-        # 디스크에 강제 flush (시점 문제 방지)
+        # Force flush to disk (prevents timing issues) by JJH
         os.sync()
+        time.sleep(1)
+        logging.info("Finished copying and syncing update files")
 
     def get_updaters(self) -> Dict[str, BaseDeploy]:
         return self.updaters
@@ -342,8 +344,10 @@ class UpdateManager:
             self.cmd_helper.set_update_info(app, id(web_request))
             try:
                 await updater.update()
-                self._copy_update_files()  # 업데이트 성공 후 파일 복사 by JJH
-                os.sync()                  # 디스크 flush
+                self._copy_update_files()  # Copy files after successful update by JJH
+                os.sync()                  # Force flush to disk by JJH
+                time.sleep(1)
+                logging.info("Finished copying and syncing update files")
             except Exception as e:
                 self.cmd_helper.notify_update_response(
                 f"Error updating {app}: {e}", is_complete=True
@@ -404,10 +408,11 @@ class UpdateManager:
                 if self.cmd_helper.needs_service_restart(app_name):
                     await moon_updater.restart_service()
 
-                # 업데이트 성공 후 파일 복사 by JJH
+                # Copy files after successful update by JJH
                 self._copy_update_files()
                 os.sync()
-
+                time.sleep(1)
+                logging.info("Finished copying and syncing update files")
                 self.cmd_helper.set_full_complete(True)
                 self.cmd_helper.notify_update_response("Full Update Complete", is_complete=True)
 
