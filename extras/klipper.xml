@@ -1,0 +1,13 @@
+<rss version="2.0">
+  <channel>
+    <title>MOMENT</title>
+    <item>
+      <guid>klipper/2026-04-14/001</guid>
+      <title>Enjoy 3D printing.</title>
+      <link>https://example.com/announcement</link>
+      <description>www.moment.co.kr</description>
+      <category>low</category>
+      <pubDate>Mon, 14 Apr 2026 15:35:49 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
